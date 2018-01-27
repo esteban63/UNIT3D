@@ -16,6 +16,10 @@ use App\Ban;
 use App\Warning;
 use App\Peer;
 use App\History;
+use App\Helpers\StringHelper;
+use App\Helpers\Bbcode;
+use App\Traits\PollUser;
+use App\Interfaces\PollUserInterface;
 
 use Cache;
 
@@ -24,17 +28,16 @@ use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use function theodorejb\polycast\to_int;
-use App\Helpers\StringHelper;
-use App\Helpers\Bbcode;
 
 /**
  * User-Related Template
  *
  */
-class User extends Authenticatable
+class User extends Authenticatable implements PollUserInterface
 {
     use Notifiable;
     use Achiever;
+    use PollUser;
 
     public $rules = [
         'username' => 'required|alpha_dash|min:3|max:20|unique:users',

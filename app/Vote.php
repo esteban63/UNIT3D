@@ -12,24 +12,25 @@
 
 namespace App;
 
+use App\Option;
 use Illuminate\Database\Eloquent\Model;
 
-class Voter extends Model
+class Vote extends Model
 {
-
+    /**
+     * @var array
+     */
     protected $fillable = [
-        'poll_id',
         'user_id',
-        'ip_address'
+        'option_id',
     ];
-
-    public function poll()
+    /**
+     * Option relation
+     *
+     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function option()
     {
-        return $this->belongsTo(\App\Poll::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(\App\User::class);
+        return $this->belongsTo(\App\Option::class);
     }
 }

@@ -12,68 +12,71 @@
 
 namespace App;
 
+use App\Option;
+use App\Vote;
 use Illuminate\Database\Eloquent\Model;
 
 class Poll extends Model
 {
+    /**
+     * @var array
+     */
     protected $fillable = [
         'title',
-        'slug',
-        'ip_checking',
-        'multiple_choice'
+        'description',
+        'multichoice',
+        'closed',
+        'ends_at',
     ];
 
-    protected static function boot()
-    {
-        Poll::creating(function ($poll) {
-            if (empty($poll->slug)) {
-                $poll->slug = $poll->makeSlugFromTitle($poll->title);
-            }
-            return true;
-        });
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(\App\User::class);
-    }
-
+    /**
+     * Options relation
+     *
+     * @return lluminate\Database\Eloquent\Relations\HasMany
+     */
     public function options()
     {
         return $this->hasMany(\App\Option::class);
     }
 
-    public function voters()
+    /**
+     * Number of options for ths poll
+     *
+     * @return integer
+     */
+    public function optionsCount()
     {
-        return $this->hasMany(\App\Voter::class);
+        return $this->options()->count();
     }
 
     /**
-     * Set the poll's title, adds ? if needed.
+     * Votes relation
      *
-     * @param  string $value
-     * @return string
+     * @return Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
-    public function setTitleAttribute($title)
+    public function votes()
     {
-        if (substr($title, -1) != '?') {
-            return $this->attributes['title'] = $title . '?';
-        }
-
-        return $this->attributes['title'] = $title;
+        return $this->hasManyThrough(\App\Vote::class, \App\Option::class);
     }
 
     /**
-     * Create a title slug.
+     * Total votes for this poll
      *
-     * @param  string $title
-     * @return string
+     * @return integer
      */
-
-    public function makeSlugFromTitle($title)
+    public function totalVotes()
     {
-        $slug = strlen($title) > 20 ? substr(str_slug($title), 0, 20) : str_slug($title);
-        $count = $this->where('slug', 'LIKE', "%$slug%")->count();
-        return $count ? "{$slug}-{$count}" : $slug;
+        return $this->votes()->count();
+    }
+
+    /**
+     * Has this user id already voted in this poll
+     *
+     * @param  integer  $userId
+     * @return boolean
+     */
+    public function hasVoted($userId)
+    {
+        return $this->votes()->where('user_id', $userId)->count() > 0;
     }
 }
