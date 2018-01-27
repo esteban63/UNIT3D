@@ -15,7 +15,6 @@
     <li><a href="{!! route('staff_groups_index') !!}">Groups</a></li>
     @endif
     <li><a href="{!! route('staff_page_index') !!}">Pages</a></li>
-    <li><a href="{!! route('getPolls') !!}">Polls</a></li>
     <li class="nav-header head">Torrent Tools</li>
     <li><a href="{!! route('staff_torrent_index') !!}">Torrents</a></li>
     <li><a href="{!! route('staff_category_index') !!}">Torrent Categories</a></li>

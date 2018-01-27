@@ -62,9 +62,9 @@ class PollRepository
      *
      * 'title' => 'Poll title',
      * 'description' => 'Poll description',
-     * 'options' => ['cats', 'dogs', 'fish'],
+     * 'options' => ['movies', 'music', 'tv'],
      * 'ends_at' => datetime(), // not required, default: null
-     * 'multivote' => boolean, // not required, default: true
+     * 'multichoice' => boolean, // not required, default: true
      * 'closed' => boolean, // not required, default: false
      * 'ends_at' => a valid date according to strtotime()
      *

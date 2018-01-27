@@ -430,12 +430,6 @@ Route::group(['middleware' => 'language'], function () {
         // Failed Logins
         Route::any('/failedlogin', 'FailedLoginController@getFailedAttemps')->name('getFailedAttemps');
 
-        // Polls
-        Route::get('/polls', 'PollController@polls')->name('getPolls');
-        Route::get('/poll/{id}', 'PollController@poll')->name('getPoll');
-        Route::get('/polls/create', 'PollController@create')->name('getCreatePoll');
-        Route::post('/polls/create', 'PollController@store')->name('postCreatePoll');
-
         // Activity Log
         Route::get('/activitylog', 'ActivityLogController@activityLog')->name('activityLog');
 
