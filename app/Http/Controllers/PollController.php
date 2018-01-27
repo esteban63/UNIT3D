@@ -12,21 +12,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Poll;
+use App\Exceptions\PollOptionsException;
+use App\Http\Requests\CreatePoll;
 use App\Option;
-use App\Voter;
-
+use App\Poll;
+use App\Repositories\PollRepository;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-use App\Http\Requests;
-use App\Http\Requests\StorePoll;
-use App\Http\Requests\VoteOnPoll;
-
-use \Toastr;
-
-class PollController extends Controller
+class PollController extends BaseController
 {
+    use ValidatesRequests;
+
+    /**
+     * @var App\Poll
+     */
+    protected $poll;
+
+
+    /**
+     * @var App\Repositories\PollRepository
+     */
+    protected $pollRepository;
+
+    /**
+     * Constructor
+     *
+     * @param Poll           $poll
+     * @param PollRepository $pollRepository
+     */
+    public function __construct(Poll $poll, PollRepository $pollRepository)
+    {
+        $this->poll = $poll;
+        $this->pollRepository = $pollRepository;
+
+        $this->middleware('is_modo', [
+            'only' => ['create', 'store', 'destroy'],
+        ]);
+
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -34,56 +59,78 @@ class PollController extends Controller
      */
     public function index()
     {
-        $polls = Poll::orderBy('created_at', 'desc')->paginate(15);
+        $polls = $this->poll->paginate(10);
 
-        return view('poll.latest', compact('polls'));
+        return view('poll.index', compact('polls'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create(Request $request)
+    {
+        $title = 'Create new poll';
+        $options = ($request->input('options') > config('poll.max_options')) ? config('poll.max_options') : $request->input('options');
+
+        return view('poll.create', compact('title', 'options'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(CreatePoll $request)
+    {
+        try
+        {
+            $poll = $this->pollRepository->create([
+                'title' => $request->input('title'),
+                'description' => $request->input('description'),
+                'options' => $request->input('options'),
+                'multichoice' => $request->input('multichoice'),
+                'ends_at' => $request->input('ends_at'),
+            ]);
+        }
+        catch (PollOptionsException $e)
+        {
+            abort(400, 'A poll must contain between 1 and '.config('max_options').' options');
+        }
+
+        return redirect()
+            ->route('poll.index')
+            ->with(Toastr::success('Poll Created Succefully.', 'Yay!', ['options']));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $slug)
+    public function show($id)
     {
-        $poll = Poll::whereSlug($slug)->firstOrFail();
+        $poll = $this->pollRepository->results($id);
+        $totalVotes = $poll->totalVotes();
 
-        return view('poll.show', compact('poll'));
+        return view('poll.show', compact('poll', 'totalVotes'));
     }
 
-    public function vote(VoteOnPoll $request)
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
     {
-        $user = Auth::user();
-        $poll = Option::findOrFail($request->input('option.0'))->poll;
+        $this->pollRepository->delete($id);
 
-        foreach ($request->input('option') as $option) {
-            Option::findOrFail($option)->increment('votes');
-        }
-
-        if (Voter::where('user_id', '=', $user->id)->where('poll_id', '=', $poll->id)->exists()) {
-            Toastr::error('Bro have already vote on this poll. Your vote has not been counted.', 'Whoops!', ['options']);
-
-            return redirect('poll/' . $poll->slug . '/result');
-        }
-
-        if ($poll->ip_checking == 1) {
-            $voter = Voter::create([
-                'poll_id' => $poll->id,
-                'user_id' => $user->id,
-                'ip_address' => $request->ip()
-            ]);
-        }
-
-        Toastr::success('Your vote has been counted.', 'Yay!', ['options']);
-
-        return redirect('poll/' . $poll->slug . '/result');
-    }
-
-    public function result($slug)
-    {
-        $poll = Poll::whereSlug($slug)->firstOrFail();
-
-        return view('poll.result', compact('poll'));
+        return redirect()
+            ->route('polls.index')
+            ->with(Toastr::info('Poll Deleted Successfully.', 'Yay!', ['options']));
     }
 }
