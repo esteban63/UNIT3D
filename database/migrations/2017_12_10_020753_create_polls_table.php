@@ -10,38 +10,38 @@
  * @author     HDVinnie
  */
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+ use Illuminate\Support\Facades\Schema;
+ use Illuminate\Database\Schema\Blueprint;
+ use Illuminate\Database\Migrations\Migration;
 
-class CreatePollsTable extends Migration
-{
+ class CreatePollsTable extends Migration
+ {
+     /**
+      * Run the migrations.
+      *
+      * @return void
+      */
+     public function up()
+     {
+         Schema::create('polls', function (Blueprint $table) {
+             $table->increments('id');
+             $table->integer('user_id')->unsigned()->default(0);
+             $table->string('title');
+             $table->text('description');
+             $table->boolean('multichoice')->default(false);
+             $table->boolean('closed')->default(false);
+             $table->dateTime('ends_at')->nullable()->default(null);
+             $table->timestamps();
+         });
+     }
 
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('polls', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('user_id')->unsigned()->default(0);
-            $table->string('title');
-            $table->string('slug');
-            $table->boolean('ip_checking')->default(0);
-            $table->boolean('multiple_choice')->default(0);
-            $table->timestamps();
-        });
-    }
-
-
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::drop('polls');
-    }
-}
+     /**
+      * Reverse the migrations.
+      *
+      * @return void
+      */
+     public function down()
+     {
+         Schema::dropIfExists('polls');
+     }
+ }
