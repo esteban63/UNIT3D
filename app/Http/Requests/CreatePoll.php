@@ -9,12 +9,12 @@
  * @license    https://choosealicense.com/licenses/gpl-3.0/  GNU General Public License v3.0
  * @author     HDVinnie
  */
- 
+
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class VoteOnPoll extends FormRequest
+class CreatePoll extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -34,19 +34,24 @@ class VoteOnPoll extends FormRequest
     public function rules()
     {
         return [
-            'option' => 'required|min:1',
+            'title' => 'required|max:140',
+            'description' => 'required',
+            'options.*' => 'required|max:140',
+            'multichoice' => 'boolean',
+            'ends_at' => 'date',
         ];
     }
 
     /**
-     * Get the error messages for the defined validation rules.
+     * Custom validation messages
      *
      * @return array
      */
     public function messages()
     {
         return [
-            'option.required' => 'You must select an answer',
+            'options.*.required'  => 'Option is required',
+            'options.*.max'  => 'Option exceeded maximum length',
         ];
     }
 }
