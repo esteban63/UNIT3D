@@ -19,23 +19,28 @@
 
 @section('content')
 <div class="box container">
-  <div class="page-title">
-    <h1>{{ $poll->title }}</h1></div>
-  <hr>
-  <div class="forum-categories">
-    <div class="forum-category">
-      <div class="forum-category-title col-md-12">
-        <div class="forum-category-childs">
-          @include('poll.forms.vote')
-          @if($poll->multiple_choice)
-          <span class="badge-user text-bold text-red">{{ trans('poll.multiple-choice') }}</span>
-          @endif
-          @if($poll->ip_checking)
-          <span class="badge-user text-bold text-red">{{ trans('poll.ip-checking') }}</span>
-          @endif
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ $poll->title }}</h3>
         </div>
-      </div>
+        <div class="panel-body">
+            @foreach ($poll->options as $option)
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="{{ $option->votesPercent($totalVotes) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $option->votesPercent($totalVotes) }}%; min-width: 2em;">
+                        {{ $option->votesPercent($totalVotes) }}%
+                    </div>
+                </div>
+            @endforeach
+            <p>Total votes: {{ $totalVotes }}</p>
+            <hr />
+            @include('poll::forms.options', ['options' => $poll->options])
+        </div>
     </div>
-  </div>
+
+    @auth(config('poll.admin_middleware'))
+        <form action="{{ route('polls.destroy', $poll->id) }}" method="POST" role="form">
+            <button type="submit" class="btn btn-danger">Delete poll</button>
+        </form>
+    @endauth
 </div>
 @endsection

@@ -20,19 +20,20 @@
       <h1>{{ trans('poll.current') }}</h1>
     </div>
   </div>
-  <div class="forum-categories">
-    <div class="forum-category">
-      <div class="forum-category-title col-md-12">
-        <div class="forum-category-childs">
-          @foreach ($polls as $poll)
-          <a href="{{ url('/poll/' . $poll->slug) }}" class="forum-category-childs-forum col-md-4">
-            <h3 class="text-bold">{{ $poll->title }}</h3>
-            <p>{{ trans('poll.vote-now') }}</p>
-          </a>
-          @endforeach
-        </div>
+  @if ($polls->count() == 0)
+      <p>There are no polls, create one below!</p>
+  @endif
+
+  @foreach ($polls as $poll)
+      <div class="polls">
+          <h3 class="poll-title"><a href="{{ route('polls.show', $poll->id) }}">{{ $poll->title }}</a></h3>
       </div>
-    </div>
-  </div>
+  @endforeach
+
+  {{ $polls->links() }}
+
+  <hr />
+
+  @include('poll.forms.create_options')
 </div>
 @endsection
