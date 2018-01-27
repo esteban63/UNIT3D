@@ -9,13 +9,13 @@
  * @license    https://choosealicense.com/licenses/gpl-3.0/  GNU General Public License v3.0
  * @author     HDVinnie
  */
- 
+
 namespace App\Casters;
 
 use App\Exceptions\DuplicateVoteException;
 use App\Exceptions\PollClosedException;
-use App\Poll\Exceptions\PollTimeoutException;
-use App\Poll\Exceptions\InvalidOptionException;
+use App\Exceptions\PollTimeoutException;
+use App\Exceptions\InvalidOptionException;
 use App\Interfaces\PollUserInterface;
 use App\Option;
 use App\Poll;
