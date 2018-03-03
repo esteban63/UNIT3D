@@ -115,24 +115,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Has send many pms
-     *
-     */
-    public function pm_sender()
-    {
-        return $this->hasMany(\App\PrivateMessage::class, "sender_id");
-    }
-
-    /**
-     * Has received many pms
-     *
-     */
-    public function pm_receiver()
-    {
-        return $this->hasMany(\App\PrivateMessage::class, "reciever_id");
-    }
-
-    /**
      * Has many peers
      *
      */

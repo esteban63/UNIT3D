@@ -152,17 +152,6 @@ Route::group(['middleware' => 'language'], function () {
         // Page
         Route::get('/p/{slug}.{id}', 'PageController@page')->name('page');
 
-        // Private Messages System
-        Route::get('/{username}.{id}/inbox', 'PrivateMessageController@getPrivateMessages')->name('inbox');
-        Route::get('/{username}.{id}/message/{pmid}', 'PrivateMessageController@getPrivateMessageById')->name('message');
-        Route::get('/{username}.{id}/outbox', 'PrivateMessageController@getPrivateMessagesSent')->name('outbox');
-        Route::get('/{username}.{id}/create', 'PrivateMessageController@makePrivateMessage')->name('create');
-        Route::any('/{username}.{id}/mark-all-read', 'PrivateMessageController@markAllAsRead')->name('mark-all-read');
-        Route::post('/send-private-message', 'PrivateMessageController@sendPrivateMessage')->name('send-pm');
-        Route::any('/reply-private-message/{pmid}', 'PrivateMessageController@replyPrivateMessage')->name('reply-pm');
-        Route::any('/{username}.{id}/searchPM', 'PrivateMessageController@searchPM')->name('searchPM');
-        Route::any('/deletePM/{pmid}', 'PrivateMessageController@deletePrivateMessage')->name('delete-pm');
-
         // Requests
         Route::get('/requests', 'RequestController@requests')->name('requests');
         Route::any('/request/add', 'RequestController@addrequest')->name('add_request');
